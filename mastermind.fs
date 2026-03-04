@@ -1,6 +1,65 @@
 
+\ 6 ^ 4 =  1296 = 162 bytes
+
+\ 1111 = 0
+\ 1112 = 1
+\ … 
+\ 1116 = 5
+\ 1121 = 6
+\ …
+\ 1126 = 11
+
+
+: INDEX>CODEWORD ( i -- n )
+    6 /MOD 6 /MOD 6 /MOD
+    0 4 0 DO 10 * SWAP 1+ + LOOP ;
+
+: CODEWORD>INDEX ( n -- i )
+    10 /MOD 10 /MOD 10 /MOD
+    0 4 0 DO 6 * SWAP 1- + LOOP ;
+
+: CHECKINDEX
+    1296 0 DO
+        I DUP . INDEX>CODEWORD DUP . CODEWORD>INDEX . CR 
+    LOOP ;
+
 6 CONSTANT MAXCOLOR
 4 CONSTANT N
+
+CREATE RESPONSES
+0 C, 4 C,
+0 C, 3 C,
+0 C, 2 C,
+0 C, 1 C,
+0 C, 0 C,
+1 C, 3 C,
+1 C, 2 C,
+1 C, 1 C,
+1 C, 0 C,
+2 C, 2 C,
+2 C, 1 C,
+2 C, 0 C,
+3 C, 1 C,
+3 C, 0 C,
+4 C, 0 C,
+
+15 CONSTANT MAX-RESPONSES
+
+CREATE NUM-POSSIBILITIES MAX-RESPONSES CELLS ALLOT
+
+: INIT-NUM-POSSIBILITES
+    NUM-POSSIBILITIES MAX-RESPONSES CELLS ERASE ;
+
+CREATE CODEWORDS 6666 ALLOT
+
+: INIT-CODEWORDS
+    CODEWORDS 6666 1 FILL ;
+
+: ELIMINATE-CODEWORD ( n -- )
+    CODEWORDS + 0 SWAP C! ;
+
+: VALID-CODEWORD? ( n -- f )
+    CODEWORDS + C@ ;
 
 VARIABLE PATTERN
 VARIABLE TEST
@@ -94,14 +153,69 @@ VARIABLE MAX-POSSIBLE
     ROT FIRST-CODEWORD              \ b w p c
     BEGIN
         DUP -1 <> WHILE 
-        2DUP SCORE                  \ b w p c b' w'
-        2>R 2OVER 2R> D= IF
-            DUP .
-            1 MAX-POSSIBLE +!
-            MAX-POSSIBLE @ 16 MOD 0= IF CR THEN
+        DUP VALID-CODEWORD? IF
+            2DUP SCORE                  \ b w p c b' w'
+            2>R 2OVER 2R> D= IF
+                DUP .
+                1 MAX-POSSIBLE +!
+                MAX-POSSIBLE @ 16 MOD 0= IF CR THEN
+            THEN
         THEN
         NEXT-CODEWORD
     REPEAT 2DROP 2DROP 
     CR MAX-POSSIBLE ? ;
 
+: NUM-POSSIBLE-CODEWORDS ( p b w -- n )
+    0 MAX-POSSIBLE !
+    ROT FIRST-CODEWORD
+    BEGIN
+        DUP -1 <> WHILE
+        2DUP SCORE 2>R 2OVER 2R>
+        D= IF 1 MAX-POSSIBLE +! THEN
+        NEXT-CODEWORD
+    REPEAT 2DROP 2DROP
+    MAX-POSSIBLE @ ;
 
+: .ALL-NUM-POSSIBLE-CODEWORDS ( p -- )
+    DUP . ." : " CR
+    INIT-NUM-POSSIBILITES
+    MAX-RESPONSES 0 DO
+        DUP
+        RESPONSES I 2* +
+        DUP C@ SWAP 1+ C@ 
+        2DUP SWAP . . ." : "
+        NUM-POSSIBLE-CODEWORDS . CR
+    LOOP DROP .s ;
+
+INIT-CODEWORDS
+
+: REMOVE-CODEWORDS ( p b w -- )
+    ROT FIRST-CODEWORD
+    BEGIN
+        DUP -1 <> WHILE
+        DUP VALID-CODEWORD? IF
+            2DUP SCORE 2>R 2OVER 2R>
+            D<> IF DUP ELIMINATE-CODEWORD THEN
+        THEN
+        NEXT-CODEWORD
+    REPEAT 2DROP 2DROP ;
+
+: .CODEWORDS
+    FIRST-CODEWORD
+    BEGIN
+        DUP -1 <> WHILE
+        DUP VALID-CODEWORD? IF
+            DUP .
+        THEN
+        NEXT-CODEWORD
+    REPEAT DROP ;
+
+: .CODEWORD-INDEX
+    0 FIRST-CODEWORD
+    BEGIN
+        DUP -1 <> WHILE
+        OVER . DUP .
+        OVER 36 MOD 35 =  IF CR THEN
+        NEXT-CODEWORD
+        SWAP 1+ SWAP
+    REPEAT ;
