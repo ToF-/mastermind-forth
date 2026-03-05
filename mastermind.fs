@@ -9,213 +9,36 @@
 \ …
 \ 1126 = 11
 
+6 CONSTANT MAXCOLOR
+1296 CONSTANT MAXCODEWORDS
+MAXCODEWORDS 8 / CONSTANT SETSIZE
 
 : INDEX>CODEWORD ( i -- n )
-    6 /MOD 6 /MOD 6 /MOD
+    MAXCOLOR /MOD MAXCOLOR /MOD MAXCOLOR /MOD
     0 4 0 DO 10 * SWAP 1+ + LOOP ;
 
 : CODEWORD>INDEX ( n -- i )
     10 /MOD 10 /MOD 10 /MOD
-    0 4 0 DO 6 * SWAP 1- + LOOP ;
-
-: CHECKINDEX
-    1296 0 DO
-        I DUP . INDEX>CODEWORD DUP . CODEWORD>INDEX . CR 
-    LOOP ;
-
-6 CONSTANT MAXCOLOR
-4 CONSTANT N
-
-CREATE RESPONSES
-0 C, 4 C,
-0 C, 3 C,
-0 C, 2 C,
-0 C, 1 C,
-0 C, 0 C,
-1 C, 3 C,
-1 C, 2 C,
-1 C, 1 C,
-1 C, 0 C,
-2 C, 2 C,
-2 C, 1 C,
-2 C, 0 C,
-3 C, 1 C,
-3 C, 0 C,
-4 C, 0 C,
-
-15 CONSTANT MAX-RESPONSES
-
-CREATE NUM-POSSIBILITIES MAX-RESPONSES CELLS ALLOT
-
-: INIT-NUM-POSSIBILITES
-    NUM-POSSIBILITIES MAX-RESPONSES CELLS ERASE ;
-
-CREATE CODEWORDS 6666 ALLOT
-
-: INIT-CODEWORDS
-    CODEWORDS 6666 1 FILL ;
-
-: ELIMINATE-CODEWORD ( n -- )
-    CODEWORDS + 0 SWAP C! ;
-
-: VALID-CODEWORD? ( n -- f )
-    CODEWORDS + C@ ;
-
-VARIABLE PATTERN
-VARIABLE TEST
-
-: PEG? ( n -- f )
-    1 MAXCOLOR 1+ WITHIN ;
-
-: PATTERN? ( n -- f )
-    TRUE SWAP
-    N 0 DO
-        10 /MOD
-        SWAP PEG? ROT AND SWAP
-    LOOP DROP ;
-
-CREATE PATTERNCOLORS MAXCOLOR 1+ ALLOT
-CREATE TESTCOLORS MAXCOLOR 1+ ALLOT
+    0 4 0 DO MAXCOLOR * SWAP 1- + LOOP ;
 
 
-: TALLY-COLORS ( pattern,addr )
-    DUP MAXCOLOR 1+  ERASE SWAP
-    N 0 DO
-        OVER >R
-        10 /MOD
-        SWAP R> +
-        DUP C@ 1+ SWAP C!
-    LOOP 2DROP ;
+: CODEWORD-SET
+    CREATE 0 , SETSIZE ALLOT ;
 
-: HITS ( -- n )
-    0 MAXCOLOR 1+ 1 DO
-        PATTERNCOLORS I + C@
-        TESTCOLORS I + C@ MIN
-        +
-    LOOP ;
+: INITSET ( addr -- )
+    0 OVER !
+    CELL+ SETSIZE 255 FILL ;
 
-: MISSES ( -- n )
-    0 MAXCOLOR 1+ 1 DO
-        PATTERNCOLORS I + C@
-        TESTCOLORS I + C@
-        - 0 MAX
-        +
-    LOOP ;
+: NEXT-CODEWORD ( set -- cw,f )
+    >R R@ @ 8 /MOD
+    R@ CELL+ + C@
+    2 ROT LSHIFT AND IF
+        R@ @ INDEX>CODEWORD TRUE
+        1 R> +!
+    1 R> +! ;
 
-: BLACK-HITS ( -- n )
-    0 PATTERN @ TEST @ 
-    N 0 DO
-        10 /MOD SWAP ROT
-        10 /MOD SWAP ROT
-        = IF
-            ROT 1+ -ROT
-        THEN
-    LOOP 2DROP ;
-
-: WHITE-HITS ( -- n )
-    HITS BLACK-HITS - ;
-
-: INIT-PATTERN ( n -- )
-    DUP PATTERN !
-    PATTERNCOLORS TALLY-COLORS ;
-
-: INIT-TEST ( n -- )
-    DUP TEST !
-    TESTCOLORS TALLY-COLORS ;
-
-: SCORE ( p,t -- b,w )
-    INIT-TEST
-    INIT-PATTERN
-    BLACK-HITS
-    WHITE-HITS ;
-    
-: .SCORE ( p,t -- )
-    SCORE SWAP . . CR ;
-
-1111 CONSTANT FIRST-CODEWORD
-
-: NEXT-CODEWORD-REC ( n -- n' )
-    10 /MOD SWAP DUP 6 < IF
-        1+
-    ELSE
-        DROP RECURSE 1
-    THEN
-    SWAP 10 * + ;
-
-: NEXT-CODEWORD ( n -- n' )
-    DUP 6666 = IF DROP -1 ELSE NEXT-CODEWORD-REC THEN ;
-
-
-VARIABLE MAX-POSSIBLE
-
-: .POSSIBLE-CODEWORDS ( p b w -- )
-    0 MAX-POSSIBLE !
-    ROT FIRST-CODEWORD              \ b w p c
-    BEGIN
-        DUP -1 <> WHILE 
-        DUP VALID-CODEWORD? IF
-            2DUP SCORE                  \ b w p c b' w'
-            2>R 2OVER 2R> D= IF
-                DUP .
-                1 MAX-POSSIBLE +!
-                MAX-POSSIBLE @ 16 MOD 0= IF CR THEN
-            THEN
-        THEN
-        NEXT-CODEWORD
-    REPEAT 2DROP 2DROP 
-    CR MAX-POSSIBLE ? ;
-
-: NUM-POSSIBLE-CODEWORDS ( p b w -- n )
-    0 MAX-POSSIBLE !
-    ROT FIRST-CODEWORD
-    BEGIN
-        DUP -1 <> WHILE
-        2DUP SCORE 2>R 2OVER 2R>
-        D= IF 1 MAX-POSSIBLE +! THEN
-        NEXT-CODEWORD
-    REPEAT 2DROP 2DROP
-    MAX-POSSIBLE @ ;
-
-: .ALL-NUM-POSSIBLE-CODEWORDS ( p -- )
-    DUP . ." : " CR
-    INIT-NUM-POSSIBILITES
-    MAX-RESPONSES 0 DO
-        DUP
-        RESPONSES I 2* +
-        DUP C@ SWAP 1+ C@ 
-        2DUP SWAP . . ." : "
-        NUM-POSSIBLE-CODEWORDS . CR
-    LOOP DROP .s ;
-
-INIT-CODEWORDS
-
-: REMOVE-CODEWORDS ( p b w -- )
-    ROT FIRST-CODEWORD
-    BEGIN
-        DUP -1 <> WHILE
-        DUP VALID-CODEWORD? IF
-            2DUP SCORE 2>R 2OVER 2R>
-            D<> IF DUP ELIMINATE-CODEWORD THEN
-        THEN
-        NEXT-CODEWORD
-    REPEAT 2DROP 2DROP ;
-
-: .CODEWORDS
-    FIRST-CODEWORD
-    BEGIN
-        DUP -1 <> WHILE
-        DUP VALID-CODEWORD? IF
-            DUP .
-        THEN
-        NEXT-CODEWORD
-    REPEAT DROP ;
-
-: .CODEWORD-INDEX
-    0 FIRST-CODEWORD
-    BEGIN
-        DUP -1 <> WHILE
-        OVER . DUP .
-        OVER 36 MOD 35 =  IF CR THEN
-        NEXT-CODEWORD
-        SWAP 1+ SWAP
-    REPEAT ;
+: ELIMINATE-CODEWORD ( cw,set -- )
+    SWAP CODEWORD>INDEX 8 /MOD
+    ROT CELL+ + >R 
+    2 SWAP LSHIFT 255 XOR
+    R@ C@ AND R> C! ;
