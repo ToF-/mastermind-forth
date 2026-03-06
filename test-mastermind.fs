@@ -66,4 +66,16 @@ T{ ." eliminating codewords from set" CR
     MY-SET NEXT-CODEWORD 0 ?S
 }T
 
+T{ ." inserting codewords into set" CR
+    MY-SET CELL+ SETSIZE ERASE ( eliminate all codewords from set )
+    1234 MY-SET INSERT-CODEWORD
+    2341 MY-SET INSERT-CODEWORD
+    6622 MY-SET INSERT-CODEWORD
+    MY-SET START-SET
+    MY-SET NEXT-CODEWORD 1234 ?S
+    MY-SET NEXT-CODEWORD 2341 ?S
+    MY-SET NEXT-CODEWORD 6622 ?S
+    MY-SET NEXT-CODEWORD 0 ?S
+}T
+
 BYE
