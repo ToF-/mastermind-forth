@@ -11,6 +11,40 @@ T{
 }T
 
 T{
+    ." matching a codeword to a test" CR
+    4263 1111 MATCHES 0 ?S
+    4263 2433 MATCHES 1 ?S
+    4263 3266 MATCHES 2 ?S
+    4263 4263 MATCHES 4 ?S
+
+    4263 1111 HITS 0 ?S
+    4263 6211 HITS 2 ?S
+    4263 3336 HITS 2 ?S
+    4432 4111 HITS 1 ?S
+    4263 3624 HITS 4 ?S
+
+    4263 1111 MISSES 0 ?S
+    4263 4236 MISSES 2 ?S
+    4263 2111 MISSES 1 ?S
+    4263 3331 MISSES 1 ?S
+    4263 4263 MISSES 0 ?S
+
+    4263 1111 MATCH 0 ?S
+    4263 1122 MATCH 01 ?S
+    4263 4111 MATCH 10 ?S
+    4263 3264 MATCH 22 ?S
+    4263 4263 MATCH 40 ?S
+}T
+
+T{
+    ." result index" CR
+    20 RESULT-INDEX 11 ?S
+    40 RESULT-INDEX 14 ?S
+    03 RESULT-INDEX 1 ?S
+}T
+
+BYE
+T{
     ." codeword set iterator" CR
     CODEWORD-SET MY-SET
     MY-SET INITSET

@@ -22,23 +22,48 @@ MAXCODEWORDS 8 / CONSTANT SETSIZE
     0 4 0 DO MAXCOLOR * SWAP 1- + LOOP ;
 
 
-: CODEWORD-SET
-    CREATE 0 , SETSIZE ALLOT ;
+: MATCHES ( cw,tw -- n )
+    0 -ROT
+    4 0 DO
+        10 /MOD SWAP ROT
+        10 /MOD SWAP ROT
+        = IF ROT 1+ -ROT THEN
+    LOOP 2DROP ;
 
-: INITSET ( addr -- )
-    0 OVER !
-    CELL+ SETSIZE 255 FILL ;
+CREATE SECRET-COLORS 7 ALLOT
+CREATE TEST-COLORS 7 ALLOT
 
-: NEXT-CODEWORD ( set -- cw,f )
-    >R R@ @ 8 /MOD
-    R@ CELL+ + C@
-    2 ROT LSHIFT AND IF
-        R@ @ INDEX>CODEWORD TRUE
-        1 R> +!
-    1 R> +! ;
+: TALLY-COLORS ( cw,addr -- )
+    >R R@ 7 ERASE
+    10 /MOD SWAP R@ + 1 SWAP +!
+    10 /MOD SWAP R@ + 1 SWAP +!
+    10 /MOD SWAP R@ + 1 SWAP +!
+    R> + 1 SWAP +! ;
 
-: ELIMINATE-CODEWORD ( cw,set -- )
-    SWAP CODEWORD>INDEX 8 /MOD
-    ROT CELL+ + >R 
-    2 SWAP LSHIFT 255 XOR
-    R@ C@ AND R> C! ;
+: HITS ( cw,tw -- n )
+    TEST-COLORS TALLY-COLORS
+    SECRET-COLORS TALLY-COLORS
+    0 MAXCOLOR 1+ 1 DO
+        SECRET-COLORS I + C@
+        TEST-COLORS I + C@ MIN +
+    LOOP ;
+
+: MISSES ( cw,tw -- n )
+    2DUP HITS -ROT MATCHES - ;
+
+: MATCH ( cw,tw -- bw )
+    2DUP MATCHES 10 * -ROT
+    MISSES + ;
+
+15 CONSTANT MAXRESULT
+CREATE RESULT-VALUES
+04 C, 03 C, 02 C, 01 C, 00 C, 13 C, 12 C, 11 C, 10 C, 22 C, 21 C, 20 C, 31 C, 30 C, 40 C,
+
+: RESULT-INDEX ( bw -- n )
+    0 SWAP
+    MAXRESULT 0 DO
+        DUP RESULT-VALUES I + C@ = IF
+            NIP I SWAP LEAVE
+        THEN
+    LOOP DROP ;
+        
