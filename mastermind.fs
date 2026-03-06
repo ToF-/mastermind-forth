@@ -66,4 +66,26 @@ CREATE RESULT-VALUES
             NIP I SWAP LEAVE
         THEN
     LOOP DROP ;
-        
+
+: CODEWORD-SET ( <name> -- )
+    CREATE 0 , SETSIZE ALLOT ;
+
+: INIT-SET ( set -- )
+    CELL+ SETSIZE 255 FILL ;
+
+: START-SET ( set -- )
+    -1 SWAP ! ;
+
+: NEXT-CODEWORD ( set -- n|0 )
+    1 OVER +!
+    @ DUP MAXCODEWORDS < IF
+        INDEX>CODEWORD
+    ELSE
+        DROP 0
+    THEN ;
+
+: ELIMINATE-CODEWORD ( cw,set -- )
+    CELL+ SWAP CODEWORD>INDEX 8 /MOD ROT +
+    DUP C@ ROT 2 SWAP LSHIFT 255 XOR
+    AND SWAP C! ;
+

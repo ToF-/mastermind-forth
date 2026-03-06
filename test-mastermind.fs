@@ -2,16 +2,14 @@ REQUIRE mastermind.fs
 REQUIRE ffl/tst.fs
 
 PAGE
-T{
-    ." index to codeword and back" CR
+T{ ." index to codeword and back" CR
     0 INDEX>CODEWORD 1111 ?S
     1111 CODEWORD>INDEX 0 ?S
     1295 INDEX>CODEWORD 6666 ?S
     6666 CODEWORD>INDEX 1295 ?S
 }T
 
-T{
-    ." matching a codeword to a test" CR
+T{ ." matching a codeword to a test" CR
     4263 1111 MATCHES 0 ?S
     4263 2433 MATCHES 1 ?S
     4263 3266 MATCHES 2 ?S
@@ -36,31 +34,29 @@ T{
     4263 4263 MATCH 40 ?S
 }T
 
-T{
-    ." result index" CR
+T{ ." result index" CR
     20 RESULT-INDEX 11 ?S
     40 RESULT-INDEX 14 ?S
     03 RESULT-INDEX 1 ?S
 }T
 
-BYE
-T{
-    ." codeword set iterator" CR
+T{ ." codewords set" CR
     CODEWORD-SET MY-SET
-    MY-SET INITSET
-    MY-SET SETSIZE CELL+ DUMP
-    MY-SET NEXT-CODEWORD ?true 1111 ?S
-    MY-SET NEXT-CODEWORD ?true 1112 ?S
-    MY-SET NEXT-CODEWORD ?true 1113 ?S
+    MY-SET INIT-SET
+    MY-SET START-SET
+    MY-SET NEXT-CODEWORD 1111 ?S
+    MY-SET NEXT-CODEWORD 1112 ?S
+    MAXCODEWORDS 3 - MY-SET !
+    MY-SET NEXT-CODEWORD 6665 ?S
+    MY-SET NEXT-CODEWORD 6666 ?S
+    MY-SET NEXT-CODEWORD 0 ?S
 }T
 
-T{
-    ." eliminating a codeword from a set" CR
-    MY-SET INITSET
+T{ ." eliminating codewords from set" CR
     1112 MY-SET DBG ELIMINATE-CODEWORD
-    MY-SET NEXT-CODEWORD ?true 1111 ?S
-    MY-SET NEXT-CODEWORD ?true 1113 ?S
+    MY-SET START-SET
+    MY-SET NEXT-CODEWORD 1111 ?S
+    MY-SET NEXT-CODEWORD 1113 ?S
 }T
-
 
 BYE
