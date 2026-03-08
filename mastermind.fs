@@ -33,6 +33,24 @@ MAXCODEWORDS 8 / CONSTANT SETSIZE
 CREATE SECRET-COLORS 7 ALLOT
 CREATE TEST-COLORS 7 ALLOT
 
+: .PEG ( p -- )
+    DUP 1 = IF
+        ." ⚫"
+    ELSE DUP 2 = IF
+        ." 🟣"
+    ELSE DUP 3 = IF
+        ." 🟢"
+    ELSE DUP 4 = IF
+        ." 🔵"
+    ELSE DUP 5 = IF
+        ." 🔴"
+    ELSE
+        ." 🟠"
+    THEN THEN THEN THEN THEN DROP ;
+
+: .PEGS ( cw -- )
+    10 /MOD 10 /MOD 10 /MOD .PEG .PEG .PEG .PEG SPACE SPACE ;
+
 : TALLY-COLORS ( cw,addr -- )
     >R R@ 7 ERASE
     10 /MOD SWAP R@ + 1 SWAP +!
@@ -52,8 +70,8 @@ CREATE TEST-COLORS 7 ALLOT
     2DUP HITS -ROT MATCHES - ;
 
 : MATCH ( cw,tw -- bw )
-    2DUP MATCHES 10 * -ROT
-    MISSES + ;
+    2DUP MISSES 10 * -ROT
+    MATCHES + ;
 
 15 CONSTANT MAXRESULT
 CREATE RESULT-VALUES
@@ -170,6 +188,20 @@ CODEWORD-SET POSSIBLE-CODES
         THEN
     REPEAT DROP ;
 
+VARIABLE MATCHING-SET
 
+: .MATCHING-CODEWORDS ( cw,bw,set -- )
+    .s
+    ROT DUP >R -ROT R> .PEGS CR
+    DUP MATCHING-SET !
+    DUP INIT-SET START-SET
+    BEGIN
+        MATCHING-SET @ NEXT-CODEWORD ?DUP WHILE   \ cw,bw,p
+        POSSIBLE-CODE !
+        2DUP SWAP POSSIBLE-CODE @ MATCH = IF
+            POSSIBLE-CODE @ .PEGS
+        THEN
+    REPEAT 2DROP ;
+    
 
 
