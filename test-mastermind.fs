@@ -2,11 +2,41 @@ REQUIRE mastermind.fs
 REQUIRE ffl/tst.fs
 
 PAGE
+T{ ." some constants" CR
+    MAX-COLORS 6 ?S
+    MAX-PEGS 4 ?S
+    MAX-CODEWORDS 1296 ?S
+}T
+
 T{ ." index to codeword and back" CR
     0 INDEX>CODEWORD 1111 ?S
     1111 CODEWORD>INDEX 0 ?S
     1295 INDEX>CODEWORD 6666 ?S
     6666 CODEWORD>INDEX 1295 ?S
+}T
+
+T{ ." code sets" CR
+    CODE-SET MY-SET
+    MY-SET INIT-SET
+    MY-SET SET-SIZE 1296 ?S
+}T
+
+T{ ." emptying and inserting into set" CR
+    MY-SET EMPTY-SET
+    MY-SET SET-SIZE 0 ?S
+    2611 MY-SET INSERT-CODEWORD
+    3666 MY-SET INSERT-CODEWORD
+    1115 MY-SET INSERT-CODEWORD
+    MY-SET SET-SIZE 3 ?S
+}T
+
+T{ ." removing from a set" CR
+    MY-SET INIT-SET
+    MY-SET SET-SIZE 1296 ?S
+    2611 MY-SET REMOVE-CODEWORD
+    3666 MY-SET REMOVE-CODEWORD
+    1115 MY-SET REMOVE-CODEWORD
+    MY-SET SET-SIZE 1293 ?S
 }T
 
 T{ ." matching a codeword to a test" CR
@@ -27,12 +57,15 @@ T{ ." matching a codeword to a test" CR
     4263 3331 MISSES 1 ?S
     4263 4263 MISSES 0 ?S
 
-    4263 1111 MATCH 0 ?S
-    4263 1122 MATCH 01 ?S
-    4263 4111 MATCH 10 ?S
+
+    4263 1111 MATCH 00 ?S
+    4263 1122 MATCH 10 ?S
+    4263 4111 MATCH 01 ?S
     4263 3264 MATCH 22 ?S
-    4263 4263 MATCH 40 ?S
+    4263 4263 MATCH 04 ?S
+BYE
 }T
+BYE
 
 T{ ." result index" CR
     20 RESULT-INDEX 11 ?S
