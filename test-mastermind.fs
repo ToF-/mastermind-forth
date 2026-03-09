@@ -63,7 +63,17 @@ T{ ." matching a codeword to a test" CR
     4263 4111 MATCH 01 ?S
     4263 3264 MATCH 22 ?S
     4263 4263 MATCH 04 ?S
-BYE
+}T
+
+T{ ." all codewords matching a codeword for a given result" CR
+    MY-SET INIT-SET
+    CODE-SET MY-RESULT
+    1122 01 MY-SET MY-RESULT RESULT-MATCH-SET
+    MY-RESULT SET-SIZE 256 ?S
+    MY-RESULT START-SET
+    MY-RESULT NEXT-CODEWORD 1333 ?S
+    MY-RESULT NEXT-CODEWORD 1334 ?S
+    MY-RESULT NEXT-CODEWORD 1335 ?S
 }T
 BYE
 

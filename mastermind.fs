@@ -108,3 +108,24 @@ TALLY MAX-COLORS + CONSTANT TALLY-TEST
     2DUP MISSES 10 * -ROT
     MATCHES + ;
 
+VARIABLE SOURCE-SET
+VARIABLE TARGET-SET
+
+: RESULT-MATCH-DO ( cw,r,set,cw' -- cw,r,set )
+    DUP >R
+    2OVER                   \ cw,r,set,cw',cw,r
+    -ROT MATCH              \ cw,r,set,r,r'
+    = IF
+        R> TARGET-SET @ INSERT-CODEWORD
+    ELSE
+        R> DROP
+    THEN ;
+
+: RESULT-MATCH-SET ( cw,r,srce,dest )
+    TARGET-SET !
+    SOURCE-SET !
+    TARGET-SET @ EMPTY-SET
+    ['] RESULT-MATCH-DO IS DO-WITH-CODEWORD
+    SOURCE-SET @ SET-ITERATE
+    2DROP ;
+
