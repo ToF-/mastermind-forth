@@ -1,3 +1,5 @@
+REQUIRE random.fs
+
 6 CONSTANT MAX-COLORS
 4 CONSTANT MAX-PEGS
 
@@ -112,8 +114,8 @@ TALLY MAX-COLORS + CONSTANT TALLY-TEST
     2DUP HITS -ROT MATCHES - ;
 
 : MATCH ( cw,tw -- bw )
-    2DUP MISSES 10 * -ROT
-    MATCHES + ;
+    2DUP MISSES -ROT
+    MATCHES 10 * + ;
 
 VARIABLE SOURCE-SET
 VARIABLE TARGET-SET
@@ -148,6 +150,14 @@ CREATE RESULT-VALUES 04 C, 03 C, 02 C, 01 C, 00 C, 13 C, 12 C, 11 C, 10 C, 22 C,
 : RESULT-VALUE ( n -- v )
     RESULT-VALUES + C@ ;
 
+: RESULT-INDEX ( r -- n )
+    15 0 DO 
+        I RESULT-VALUE OVER = IF
+            DROP I LEAVE
+        THEN
+    LOOP ;
+
+
 CREATE RESULT-SETS
     0 , MAX-CODEWORDS 8 / ALLOT
     0 , MAX-CODEWORDS 8 / ALLOT
@@ -174,5 +184,26 @@ CREATE RESULT-SETS
         SWAP I RESULT-SET    \ cw,srce,cw,r,srce,dest
         RESULT-MATCH-SET
     LOOP 2DROP ;
+
+: .RESULT ( r -- )
+    DUP 0= IF
+        ." __" DROP
+    ELSE
+        10 /MOD 
+        0 ?DO ." ●" LOOP
+        0 ?DO ." ○" LOOP
+    THEN ;
         
-        
+: .ALL-RESULTS
+    15 0 DO
+        I RESULT-VALUE .RESULT SPACE
+        I RESULT-SET DUP SET-SIZE . .SET CR
+    LOOP ;
+
+1111 VALUE SECRET
+
+: NEW-SECRET
+    1296 RANDOM INDEX>CODEWORD TO SECRET ;
+
+
+
