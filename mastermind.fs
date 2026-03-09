@@ -76,6 +76,13 @@ DEFER DO-WITH-CODEWORD
     ['] COUNT-CODEWORD IS DO-WITH-CODEWORD
     0 SWAP SET-ITERATE ;
 
+: .CODEWORD ( cw -- )
+    . ;
+
+: .SET ( set -- )
+    ['] .CODEWORD IS DO-WITH-CODEWORD
+    SET-ITERATE ;
+
 : MATCHES ( cw,tw -- n )
     0 -ROT
     MAX-PEGS 0 DO
