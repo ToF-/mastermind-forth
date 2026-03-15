@@ -186,17 +186,57 @@ variable min-max-codeword
 variable nb-guesses
 10 constant max-guesses
 
+variable secret
 create guesses max-guesses cells allot
 
+: guess ( i -- cw )
+    cells guesses + @ ;
+
+create results max-guesses allot
+
+: result ( i -- r )
+    results + c@ ;
+
+: .results
+    nb-guesses @ 0 do
+        i 1+ 2 .r space
+        i guess .
+        i result . cr
+    loop ;
+
 codewords solutions
+
+: remove-diff-result ( cw,r,cws -- )
+    -rot 2>r
+    dup codewords-start!
+    begin
+        dup next-codeword ?dup while  \ cws,ncw
+        dup 2r@                       \ cws,ncw,ncw,cw,r
+        -rot match <> if              \ cws,ncw,f
+            over codeword-remove
+        else
+            drop
+        then
+    repeat drop 2r> 2drop ;
 
 : guess-codeword ( cw -- )
     solutions all-codewords!
     1122
     max-guesses 0 do
         dup secret @ match
+        2dup results i + c!
+        guesses i cells + !
+        solutions remove-diff-result
+        i result 40 = if
+            i 1+ nb-guesses !
+            leave
+        then
+        solutions min-max-match-result
+    loop ;
 
-
+: valid-codeword? ( n -- f )
+    dup codeword>number
+    number>codeword = ;
     
 
 

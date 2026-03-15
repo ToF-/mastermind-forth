@@ -1,14 +1,24 @@
 require random.fs
-
-variable secret
+require mastermind.fs
 
 : main
     argc @ 2 < if
-        10 0 do 1296 random drop loop 
-        1296 random .
+        max-codewords random number>codeword
     else
-        1 arg type
-    then cr ;
+        1 arg s>number? if
+            drop
+            dup valid-codeword? 0 = if
+                ." not a valid codeword"
+                bye
+            then
+        else
+            ." not a number"
+            bye
+        then
+    then
+    secret !
+    guess-codeword
+    .results ;
 
 utime drop seed !
 

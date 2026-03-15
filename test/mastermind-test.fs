@@ -95,9 +95,12 @@ my-cws all-codewords!
 my-cws min-max-match-result 1122 ?s
 
 \ guessing the secret codeword
-6415 guess-codeword
-guess-nb @ 5 ?s
-0 guess @ guess>codeword 1122 ?s
-0 guess @ guess>result 2 ?s
+6415 secret !
+guess-codeword
+nb-guesses @ 5 ?s
+0 guess 1122 ?s
+0 result 1 ?s
+1 guess 2344 ?s
+1 result 1 ?s 
 bye
 
