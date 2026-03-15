@@ -174,7 +174,7 @@ variable min-max-codeword
         else
             rot 2* 1+
         then                                        \ cw,cws,r'
-        dup min-max-result @ < if                   
+        dup min-max-result @ < if
             min-max-result !
             swap min-max-codeword !                 \ cws
         else                                        \ cw,cws,r'
@@ -183,5 +183,20 @@ variable min-max-codeword
     repeat drop
     min-max-codeword @ ;
 
+variable nb-guesses
+10 constant max-guesses
+
+create guesses max-guesses cells allot
+
+codewords solutions
+
+: guess-codeword ( cw -- )
+    solutions all-codewords!
+    1122
+    max-guesses 0 do
+        dup secret @ match
+
+
+    
 
 
