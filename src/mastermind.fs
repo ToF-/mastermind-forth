@@ -1,6 +1,13 @@
 6 constant max-colors
 4 constant max-pegs
 
+
+: c++! ( addr -- )
+    dup c@ 1+ swap c! ;
+
+: ++! ( addr -- )
+    1 swap +! ;
+
 : ^ ( x,y -- x^y )
     1 swap 0 do over * loop nip ;
 
@@ -105,9 +112,6 @@ max-colors max-pegs ^ constant max-codewords
 
 create color-count max-colors 2* allot
 
-: c++ ( addr -- )
-    dup c@ 1+ swap c! ;
-
 : pegs ( cw -- c1,c2,… )
     max-pegs 1- 0 do
         10 /mod
@@ -115,7 +119,7 @@ create color-count max-colors 2* allot
 
 : count-colors ( c1,c2,…,addr -- )
     max-pegs 0 do
-        swap 1- over + c++
+        swap 1- over + c++!
     loop drop ;
 
 : hits ( cw1,cw2 -- n )
@@ -135,7 +139,47 @@ create color-count max-colors 2* allot
     2dup matches 10 *
     -rot misses + ;
 
-    
-    
+55 constant max-results \ max of results with 9 colors
+
+create result-scores max-results cells allot
+
+: init-results
+    result-scores max-results cells erase ;
+
+codewords all-codewords
+
+: max-match-result ( cw,cws -- n )
+    init-results
+    dup codewords-start!
+    begin
+        2dup next-codeword ?dup while
+        match cells result-scores + ++!
+    repeat 2drop
+    0 max-results 0 do
+        result-scores i cells + @ max
+    loop ;
+
+variable min-max-result
+variable min-max-codeword
+
+: min-max-match-result ( cws -- cw )
+    all-codewords all-codewords!
+    1000000 min-max-result !
+    begin
+        all-codewords next-codeword ?dup while      \ cws,cw
+        swap 2dup max-match-result                  \ cw,cws,r
+        -rot 2dup swap codeword-member? if          \ r,cw,cws,cws
+            rot 2*
+        else
+            rot 2* 1+
+        then                                        \ cw,cws,r'
+        dup min-max-result @ < if
+            min-max-result !
+            min-max-codeword !
+        then                                        \ cw,cws
+        nip
+    repeat 
+    min-max-codeword @ ;
+
 
 

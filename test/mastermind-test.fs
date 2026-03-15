@@ -86,5 +86,16 @@ my-cws next-codeword 0 ?s
 1264 1264 match 40 ?s
 1122 2211 match 04 ?s
 
+\ maximum of match results for a given codeword
+T{
+my-cws all-codewords!
+1122 my-cws max-match-result 256 ?s
+}T
+
+\ codeword with minimum of maximums of match results for a given codeword set
+T{
+my-cws all-codewords!
+my-cws dbg min-max-match-result 1122 ?s
+}T
 bye
 
