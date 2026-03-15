@@ -65,5 +65,26 @@ my-cws next-codeword 1111 ?s
 my-cws next-codeword 4444 ?s
 my-cws next-codeword 0 ?s
 
+\ matches, hits, misses, and match
+
+4264 1234 matches 2 ?s
+4264 4264 matches 4 ?s
+1111 4264 matches 0 ?s
+
+4264 6314 hits 2 ?s
+1264 6314 hits 3 ?s
+1264 1264 hits 4 ?s
+5555 1264 hits 0 ?s
+
+1264 6314 misses 2 ?s
+1264 5555 misses 0 ?s
+1264 1264 misses 0 ?s
+1122 2211 misses 4 ?s
+
+1264 6314 match 12 ?s
+1264 5555 match 00 ?s
+1264 1264 match 40 ?s
+1122 2211 match 04 ?s
+
 bye
 

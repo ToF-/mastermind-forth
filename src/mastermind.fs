@@ -93,6 +93,49 @@ max-colors max-pegs ^ constant max-codewords
     else
         drop 0
     then ;
+
+: matches ( cw1,cw2 -- n )
+    0 -rot
+    max-pegs 0 do
+        10 /mod rot 10 /mod rot
+        2swap = if
+            rot 1+ -rot
+        then
+    loop 2drop ;
+
+create color-count max-colors 2* allot
+
+: c++ ( addr -- )
+    dup c@ 1+ swap c! ;
+
+: pegs ( cw -- c1,c2,… )
+    max-pegs 1- 0 do
+        10 /mod
+    loop ;
+
+: count-colors ( c1,c2,…,addr -- )
+    max-pegs 0 do
+        swap 1- over + c++
+    loop drop ;
+
+: hits ( cw1,cw2 -- n )
+    color-count max-colors 2* erase
+    pegs color-count count-colors
+    pegs color-count max-colors + count-colors
+    0 max-colors 0 do
+        color-count i + c@
+        color-count max-colors + i + c@
+        min +
+    loop ;
+
+: misses ( cw1,cw2 -- n )
+    2dup hits -rot matches - ;
+
+: match  ( cw1, cw2 -- result )
+    2dup matches 10 *
+    -rot misses + ;
+
+    
     
 
 
