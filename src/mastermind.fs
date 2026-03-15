@@ -154,7 +154,8 @@ codewords all-codewords
     begin
         2dup next-codeword ?dup while
         match cells result-scores + ++!
-    repeat 2drop
+    repeat 
+    2drop drop
     0 max-results 0 do
         result-scores i cells + @ max
     loop ;
@@ -168,17 +169,18 @@ variable min-max-codeword
     begin
         all-codewords next-codeword ?dup while      \ cws,cw
         swap 2dup max-match-result                  \ cw,cws,r
-        -rot 2dup swap codeword-member? if          \ r,cw,cws,cws
+        -rot 2dup codeword-member? if               \ r,cw,cws
             rot 2*
         else
             rot 2* 1+
         then                                        \ cw,cws,r'
-        dup min-max-result @ < if
+        dup min-max-result @ < if                   
             min-max-result !
-            min-max-codeword !
-        then                                        \ cw,cws
-        nip
-    repeat 
+            swap min-max-codeword !                 \ cws
+        else                                        \ cw,cws,r'
+            rot 2drop                               \ cws
+        then
+    repeat drop
     min-max-codeword @ ;
 
 

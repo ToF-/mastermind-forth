@@ -95,7 +95,7 @@ my-cws all-codewords!
 \ codeword with minimum of maximums of match results for a given codeword set
 T{
 my-cws all-codewords!
-my-cws dbg min-max-match-result 1122 ?s
+my-cws min-max-match-result 1122 ?s
 }T
 bye
 
