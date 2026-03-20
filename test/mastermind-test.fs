@@ -17,6 +17,9 @@ last-codeword 6666 ?s
 1111 next-codeword 1112 ?s
 1112 next-codeword 1113 ?s
 1116 next-codeword 1121 ?s
+5666 next-codeword 6111 ?s
+6665 next-codeword 6666 ?s
+6666 next-codeword ?false
 
 
 

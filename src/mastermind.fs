@@ -10,12 +10,21 @@
 max-pegs (first-codeword) value first-codeword
 max-pegs (last-codeword) value last-codeword
 
+: (next-codeword) ( cw,c -- cw' )
+    if
+        10 /mod
+        swap dup max-colors < if
+            1+
+        else
+            drop 1 recurse 1
+        then
+        swap 10 * +
+    then ;
+
 : next-codeword ( cw -- cw'|0 )
-    10 /mod
-    over max-colors = if
-        nip 1+ 1
+    dup last-codeword < if
+        1 (next-codeword)
     else
-        swap 1+
-    then
-    swap 10 * + ;
+        drop 0
+    then ;
 
