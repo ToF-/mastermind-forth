@@ -1,5 +1,11 @@
+require random.fs
+
 6 value max-colors
 4 value max-pegs
+4614 value secret
+
+: all-match ( -- r )
+    max-pegs 10 * ;
 
 : (first-codeword) ( n -- cw )
     1 swap 1- 0 do 10 * 1+ loop ;
@@ -12,6 +18,19 @@ max-pegs (last-codeword) value last-codeword
 
 : unit/tenth ( cw -- c,cw' )
     10 /mod ;
+
+: random-codeword ( -- cw )
+    0 max-pegs 0 do
+        10 * max-colors random 1+ +
+    loop ;
+
+: valid-codeword? ( cw -- f )
+    true swap
+    max-pegs 0 do
+        unit/tenth
+        swap 1 max-colors within 
+        rot and swap
+    loop drop ;
 
 : (next-codeword) ( cw,c -- cw' )
     if
@@ -76,23 +95,23 @@ create factors
     swap 10 * + ;
 
 variable max-guesses
-create guesses 10 cells allot
-create results 10 cells allot
+create guess-codewords 10 cells allot
+create guess-results 10 cells allot
 
 : add-guess ( cw,r -- )
     max-guesses @ cells dup 
-    rot swap results + !
-    guesses + !
+    rot swap guess-results + !
+    guess-codewords + !
     1 max-guesses +! ;
 
-: guess# ( i -- cw )
-    cells guesses + @ ;
+: guess#codeword ( i -- cw )
+    cells guess-codewords + @ ;
 
 : result# ( i -- r )
-    cells results + @ ;
+    cells guess-results + @ ;
 
 : guess#-match? ( cw,i -- f )
-    dup guess# swap result#
+    dup guess#codeword swap result#
     -rot match = ;
 
 : in-solution? ( cw -- f )
@@ -134,4 +153,75 @@ create results 10 cells allot
         next-candidate
     repeat drop ;
 
-        
+create result-scores 100 cells allot
+
+: init-result-scores
+    result-scores 100 cells erase ;
+
+100 constant max-results
+
+: result-score# ( i -- n )
+    cells result-scores + @ ;
+
+: result-score#++ ( n -- )
+    1 swap cells result-scores + +! ;
+
+: max-result-score ( -- n )
+    0 max-results 0 do
+        i result-score# max
+    loop ;
+
+: max-match-result-score ( cw -- n )
+    init-result-scores
+    first-candidate
+    begin
+        ?dup while
+        2dup match result-score#++
+        next-candidate
+    repeat drop
+    max-result-score ;
+
+1000000 constant infinity
+
+: min-max-match-result-score ( -- cw )
+    0 infinity
+    first-codeword
+    begin
+        ?dup while                \ cw,min,cw'
+        dup max-match-result-score   \ cw,min,cw',n
+        2* over in-solution?      \ cw,min,cw',n,f
+        0= if 1+ then             \ cw,min,cw',n
+        2swap rot                 \ cw',cw,min,n
+        2dup > if
+            -rot 2drop over       \ cw',n,cw'
+        else
+            drop rot              \ cw,min,cw'
+        then
+        next-codeword
+    repeat
+    drop ;
+
+: last-guess-result ( -- r )
+    max-guesses @ 1- result# ;
+
+: last-guess-codeword ( -- cw )
+    max-guesses @ 1- guess#codeword ;
+
+: guess ( -- n )
+    max-guesses off
+    1122 dup secret match add-guess
+    begin
+        max-guesses @ . last-guess-codeword . last-guess-result . cr
+        last-guess-result all-match <> while
+        min-max-match-result-score
+        secret over match add-guess
+    repeat
+    max-guesses @ ;
+
+: .guesses
+    max-guesses @ 0 do
+        i 1+ . [char] ) emit space
+        i guess#codeword .
+        i result# . cr
+    loop ;
+

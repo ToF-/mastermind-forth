@@ -8,6 +8,11 @@ page
 max-colors 6 ?s max-pegs 4 ?s first-codeword 1111 ?s
 6 (first-codeword) 111111 ?s
 
+all-match 40 ?s
+
+1111 valid-codeword? ?true
+4807 valid-codeword? ?false
+
 \ last codeword
 
 last-codeword 6666 ?s
@@ -83,5 +88,18 @@ max-guesses off
 1352 21 add-guess
 1323 11 add-guess
 first-candidate 1542 ?s
+
+\ max match result for a given codeword and a given solution space
+max-guesses off
+1122 max-match-result-score 256 ?s
+
+\ min max match results for all codewords and a given solution space
+min-max-match-result-score 1122 ?s
+
+\ guessing in 5 moves or less
+guess
+max-guesses @ 5 ?s
+.guesses
+
 bye
 

@@ -3,7 +3,7 @@ require mastermind.fs
 
 : main
     argc @ 2 < if
-        max-codewords random number>codeword
+        random-codeword to secret
     else
         1 arg s>number? if
             drop
@@ -15,12 +15,10 @@ require mastermind.fs
             ." not a number"
             bye
         then
+        to secret
     then
-    secret !
-    guess-codeword
-    .results ;
+    guess ;
 
 utime drop seed !
-
 main
 bye
