@@ -7,11 +7,28 @@ require random.fs
 : all-match ( -- r )
     max-pegs 10 * ;
 
-: (first-codeword) ( n -- cw )
-    1 swap 1- 0 do 10 * 1+ loop ;
+: (first-codeword) ( n -- bcw )
+    1 swap 1- 0 do 4 lshift 1 or loop ;
 
 : (last-codeword) ( n -- cw )
-    max-colors swap 1- 0 do 10 * max-colors + loop ;
+    max-colors swap 1- 0 do 4 lshift max-colors or loop ;
+
+: as-decimal ( bcw -- cw )
+    max-pegs 1- 0 do
+        dup 15 and
+        swap 4 rshift
+    loop 
+    max-pegs 1- 0 do
+        10 * +
+    loop ;
+
+: as-codeword ( cw -- bcw )
+    max-pegs 1- 0 do
+        10 /mod
+    loop
+    0 max-pegs 0 do
+        4 lshift or
+    loop ;
 
 max-pegs (first-codeword) value first-codeword
 max-pegs (last-codeword) value last-codeword
@@ -19,31 +36,31 @@ max-pegs (last-codeword) value last-codeword
 : unit/tenth ( cw -- c,cw' )
     10 /mod ;
 
-: random-codeword ( -- cw )
+: random-codeword ( -- bcw )
     0 max-pegs 0 do
-        10 * max-colors random 1+ +
+        4 lshift max-colors random 1+ or
     loop ;
 
-: valid-codeword? ( cw -- f )
+: valid-codeword? ( bcw -- f )
     true swap
     max-pegs 0 do
-        unit/tenth
-        swap 1 max-colors within 
+        dup 15 and 1 max-colors within 
         rot and swap
+        4 rshift
     loop drop ;
 
 : (next-codeword) ( cw,c -- cw' )
     if
-        unit/tenth
+        dup 15 and swap 4 rshift
         swap dup max-colors < if
             1+
         else
             drop 1 recurse 1
         then
-        swap 10 * +
+        swap 4 lshift or
     then ;
 
-: next-codeword ( cw -- cw'|0 )
+: next-codeword ( bcw -- bcw'|0 )
     dup last-codeword < if
         1 (next-codeword)
     else
