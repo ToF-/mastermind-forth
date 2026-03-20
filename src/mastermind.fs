@@ -120,6 +120,7 @@ create guess-results 10 cells allot
         max-guesses @ 0 ?do
             dup i guess#-match?
             rot and swap
+            over 0= if leave then
         loop drop
     else
         true
