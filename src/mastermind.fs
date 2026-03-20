@@ -74,4 +74,54 @@ create factors
     2dup matches -rot
     hits over -
     swap 10 * + ;
+
+variable max-guesses
+create guesses 10 cells allot
+create results 10 cells allot
+
+: add-guess ( cw,r -- )
+    max-guesses @ cells dup 
+    rot swap results + !
+    guesses + !
+    1 max-guesses +! ;
+
+: guess# ( i -- cw )
+    cells guesses + @ ;
+
+: result# ( i -- r )
+    cells results + @ ;
+
+: valid-for-guess ( cw,i -- f )
+    dup guess# swap result#
+    -rot match = ;
+
+: valid-for-guesses ( cw -- f )
+    ?dup if 
+        true swap
+        max-guesses @ 0 ?do
+            dup i valid-for-guess
+            rot and swap
+        loop drop
+    else
+        true
+    then ;
+
+: (next-candidate) ( cw -- cw' )
+    begin
+        dup valid-for-guesses 0= while
+        next-codeword
+    repeat ;
     
+: next-candidate ( cw -- cw'|0 )
+    dup last-codeword < if 
+        next-codeword
+        (next-candidate)
+    else
+        drop 0
+    then ;
+
+: first-candidate ( -- cw )
+    first-codeword
+    dup valid-for-guesses 0= if
+        (next-candidate)
+    then ;
