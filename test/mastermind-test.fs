@@ -51,7 +51,7 @@ last-codeword 6666 ?s
 1111 3146 match 10 ?s
 1234 4321 match 04 ?s
 
-\ given guesses already made, what is the first codeword, and the next ones ? 
+\ given guesses already made, what is the first possible codeword, and the next ones ? 
 max-guesses off
 
 first-candidate 1111 ?s
@@ -59,10 +59,10 @@ first-candidate 1111 ?s
 1122 10 add-guess
 1344 11 add-guess
 
-1111 0 valid-for-guess ?false
+1111 0 guess#-match? ?false
 
-1111 valid-for-guesses ?false
-1535 valid-for-guesses ?true
+1111 in-solution? ?false
+1535 in-solution? ?true
 
 first-candidate 1455 ?s
 1455 next-candidate 1456 ?s
@@ -77,6 +77,11 @@ first-candidate 3542 ?s
 first-candidate 3542 ?s
 3542 next-candidate 0 ?s
 
-
+max-guesses off
+1122 20 add-guess
+1234 12 add-guess
+1352 21 add-guess
+1323 11 add-guess
+first-candidate 1542 ?s
 bye
 

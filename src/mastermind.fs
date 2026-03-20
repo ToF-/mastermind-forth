@@ -91,15 +91,15 @@ create results 10 cells allot
 : result# ( i -- r )
     cells results + @ ;
 
-: valid-for-guess ( cw,i -- f )
+: guess#-match? ( cw,i -- f )
     dup guess# swap result#
     -rot match = ;
 
-: valid-for-guesses ( cw -- f )
+: in-solution? ( cw -- f )
     ?dup if 
         true swap
         max-guesses @ 0 ?do
-            dup i valid-for-guess
+            dup i guess#-match?
             rot and swap
         loop drop
     else
@@ -108,7 +108,7 @@ create results 10 cells allot
 
 : (next-candidate) ( cw -- cw' )
     begin
-        dup valid-for-guesses 0= while
+        dup in-solution? 0= while
         next-codeword
     repeat ;
     
@@ -122,6 +122,16 @@ create results 10 cells allot
 
 : first-candidate ( -- cw )
     first-codeword
-    dup valid-for-guesses 0= if
+    dup in-solution? 0= if
         (next-candidate)
     then ;
+
+: .candidates
+    first-candidate
+    begin
+        dup while
+        dup .
+        next-candidate
+    repeat drop ;
+
+        
