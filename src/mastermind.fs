@@ -114,6 +114,38 @@ create guess-results 10 cells allot
     dup guess#codeword swap result#
     -rot match = ;
 
+variable in-solution
+variable last-codeword
+
+: keep-codeword ( cw )
+    in-solution @ if
+        46 emit drop
+    else
+        in-solution on
+        ." new interval:" .
+    then ;
+
+: drop-codeword
+    in-solution @ if
+        . cr
+    else
+        drop
+    then
+    in-solution off ;
+
+: keep-compatible ( cw,r -- )
+    in-solution off
+    first-codeword
+    begin
+        ?dup while
+        >r 2dup swap r@ match = if
+            r@ keep-codeword
+        else
+            r@ drop-codeword
+        then
+        r> next-codeword
+    repeat 2drop ;
+
 : in-solution? ( cw -- f )
     ?dup if 
         true swap
@@ -121,7 +153,8 @@ create guess-results 10 cells allot
             dup i guess#-match?
             rot and swap
             over 0= if leave then
-        loop drop
+        loop 
+        drop
     else
         true
     then ;
