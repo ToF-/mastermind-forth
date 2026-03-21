@@ -3,39 +3,28 @@ require ffl/tst.fs
 
 page
 
-\ binary codewords
-1462 as-codeword as-decimal 1462 ?s
-6666 as-codeword as-decimal 6666 ?s
-
 \ some values
 
-max-colors 6 ?s max-pegs 4 ?s first-codeword as-decimal 1111 ?s
-6 to max-pegs
-max-pegs (first-codeword) as-decimal 111111 ?s
-max-pegs (last-codeword) as-decimal 666666 ?s
-4 to max-pegs
+max-colors 6 ?s max-pegs 4 ?s first-codeword 1111 ?s
+6 (first-codeword) 111111 ?s
 
 all-match 40 ?s
 
-1111 as-codeword valid-codeword? ?true
-4807 as-codeword valid-codeword? ?false
+1111 valid-codeword? ?true
+4807 valid-codeword? ?false
 
-\ first codeword
-
-first-codeword as-decimal 1111 ?s
 \ last codeword
 
-last-codeword as-decimal 6666 ?s
+last-codeword 6666 ?s
 
 \ next codeword
 
-1111 as-codeword next-codeword as-decimal 1112 ?s
-1112 as-codeword next-codeword as-decimal 1113 ?s
-1116 as-codeword next-codeword as-decimal 1121 ?s
-5666 as-codeword next-codeword as-decimal 6111 ?s
-6665 as-codeword next-codeword as-decimal 6666 ?s
-6666 as-codeword next-codeword ?false
-bye
+1111 next-codeword 1112 ?s
+1112 next-codeword 1113 ?s
+1116 next-codeword 1121 ?s
+5666 next-codeword 6111 ?s
+6665 next-codeword 6666 ?s
+6666 next-codeword ?false
 
 \ color tally
 
