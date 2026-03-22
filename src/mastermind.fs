@@ -114,26 +114,48 @@ create guess-results 10 cells allot
     dup guess#codeword swap result#
     -rot match = ;
 
+256 constant interval-capacity
+
+: intervals ( < name > -- )
+    create 0 , interval-capacity cells allot ;
+
+: max-intervals ( ints -- n )
+    @ ;
+
+: add-interval ( start,end,ints -- )
+    dup max-intervals dup assert( interval-capacity < )
+    1+ cells over +           \ start,end,ints,addr
+    2swap 16 lshift or        \ ints,addr,int
+    swap ! 1 swap +! ;
+
+: current-interval ( ints -- start,end )
+    dup max-intervals ?dup if
+        cells + @ dup 65535 and swap 16 rshift
+    else
+        drop 0 0
+    then ;
+    
 variable in-solution
-variable last-codeword
+variable interval-stop
+variable interval#
 
 : keep-codeword ( cw )
     in-solution @ if
-        46 emit drop
+        46 emit
     else
         in-solution on
-        ." new interval:" .
-    then ;
+        1 interval# +!
+        interval# ? [char] : emit  dup .
+    then interval-stop ! ;
 
 : drop-codeword
     in-solution @ if
-        . cr
-    else
-        drop
-    then
+        interval-stop @ . cr
+    then drop
     in-solution off ;
 
 : keep-compatible ( cw,r -- )
+    interval# off
     in-solution off
     first-codeword
     begin

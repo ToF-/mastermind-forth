@@ -56,6 +56,17 @@ last-codeword 6666 ?s
 1111 3146 match 10 ?s
 1234 4321 match 04 ?s
 
+\ intervals 
+
+intervals foo
+foo max-intervals 0 ?s
+1 200 foo add-interval
+foo max-intervals 1 ?s
+foo current-interval 200 ?s 1 ?s
+345 452 foo add-interval 
+foo max-intervals 2 ?s
+foo current-interval 452 ?s 345 ?s
+
 \ given guesses already made, what is the first possible codeword, and the next ones ? 
 max-guesses off
 
