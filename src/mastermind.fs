@@ -134,7 +134,22 @@ create guess-results 10 cells allot
     else
         drop 0 0
     then ;
-    
+
+: initial-interval ( ints -- )
+    dup off
+    first-codeword last-codeword rot add-interval ;
+
+intervals intervals-a
+intervals intervals-b
+
+intervals-a value source-intervals
+intervals-b value target-intervals
+
+: switch-intervals
+    target-intervals
+    source-intervals to target-intervals
+    to source-intervals ;
+
 variable in-solution
 variable interval-stop
 variable interval#

@@ -67,6 +67,10 @@ foo current-interval 200 ?s 1 ?s
 foo max-intervals 2 ?s
 foo current-interval 452 ?s 345 ?s
 
+foo initial-interval
+foo max-intervals 1 ?s
+foo current-interval 6666 ?s 1111 ?s
+
 \ given guesses already made, what is the first possible codeword, and the next ones ? 
 max-guesses off
 
