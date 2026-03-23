@@ -1,8 +1,8 @@
 require random.fs
 
 
-6 value max-colors
-4 value max-pegs
+6 constant max-colors
+4 constant max-pegs
 
 create guess-pegs max-pegs allot
 create secret-pegs max-pegs allot
@@ -47,3 +47,75 @@ create secret-colors max-colors 1+ allot
     guess-pegs codeword>pegs!
     guess-pegs secret-pegs matches
     hits over - swap 10 * + ;
+
+: (first-codeword) ( -- cw )
+    0 max-pegs 0 do
+        10 * 1 +
+    loop ;
+
+(first-codeword) value first-codeword
+
+: (last-codeword) ( -- cw )
+    0 max-pegs 0 do
+        10 * max-colors +
+    loop ;
+
+(last-codeword) value last-codeword
+
+: (next-codeword) ( cw -- cw' )
+    1+ 10 /mod
+    over max-colors > if
+        recurse nip 1 swap
+    then
+    10 * + ;
+
+: next-codeword ( cw -- cw|0 )
+    dup last-codeword < if
+        (next-codeword) 
+    else
+        drop 0
+    then ;
+
+1024 constant max-intervals
+
+: {} ( <name> ) 
+    create 0 , max-intervals cells allot ;
+
+: {}init! ( addr -- )
+    0 !
+
+: }interval-max ( addr -- n )
+    w@ ;
+
+: }intervals ( addr - addr )
+    cell + ;
+
+: }current-interval ( addr -- addr )
+    dup 2 + w@ 8 * swap intervals + ;
+
+:interval-end ( addr -- cw )
+    4 + w@ ;
+
+: }current ( addr -- cw )
+    4 + w@ ;
+
+: }current! ( cw,addr -- )
+    4 + w! ;
+
+: (}next) ( addr -- cw|0 )
+    r>
+    r@ }current-interval interval-end
+    r@ }current dup rot < if
+        next-codeword
+        dup r@ }current!
+    else
+
+: }next ( addr -- cw|0 )
+    dup }current last-codeword < if
+        (}next)
+    else
+        drop 0
+    then ;
+
+    
+    
