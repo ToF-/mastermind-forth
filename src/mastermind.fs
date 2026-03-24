@@ -76,46 +76,49 @@ create secret-colors max-colors 1+ allot
         drop 0
     then ;
 
-1024 constant max-intervals
+last-codeword 8 / 1+ constant set-size
 
-: {} ( <name> ) 
-    create 0 , max-intervals cells allot ;
+: codeword-set ( <name> ) 
+    create set-size allot ;
 
-: {}init! ( addr -- )
-    0 !
+: set-init! ( addr -- )
+    set-size 255 fill ;
 
-: }interval-max ( addr -- n )
-    w@ ;
+: member-or-zero? ( cw,addr -- f )
+    swap 8 /mod rot +
+    c@ 1 rot lshift and ;
 
-: }intervals ( addr - addr )
-    cell + ;
-
-: }current-interval ( addr -- addr )
-    dup 2 + w@ 8 * swap intervals + ;
-
-:interval-end ( addr -- cw )
-    4 + w@ ;
-
-: }current ( addr -- cw )
-    4 + w@ ;
-
-: }current! ( cw,addr -- )
-    4 + w! ;
-
-: (}next) ( addr -- cw|0 )
-    r>
-    r@ }current-interval interval-end
-    r@ }current dup rot < if
+: first-in-set ( addr -- cw )
+    first-codeword
+    begin
+        2dup swap member-or-zero? 0= while
         next-codeword
-        dup r@ }current!
-    else
+    repeat
+    nip ;
 
-: }next ( addr -- cw|0 )
-    dup }current last-codeword < if
-        (}next)
-    else
-        drop 0
-    then ;
+: next-in-set ( cw,addr -- cw )
+    swap next-codeword 
+    begin
+        2dup swap member-or-zero? 0= while
+        next-codeword
+    repeat
+    nip ;
 
-    
-    
+: remove ( cw,addr -- )
+    swap 8 /mod rot +     \ bit,addr'
+    dup c@
+    rot 1 swap lshift 255 xor
+    and swap c! ;
+
+: narrow ( cw,r,addr -- )
+    first-codeword
+    begin
+        ?dup while               \ cw,r,addr,ca
+        2over -rot               \ cw,r,addr,r,ca,cw
+        over match-result rot    \ cw,r,addr,ca,r',r
+        <> if
+            2dup swap remove
+        then
+        next-codeword
+    repeat
+    drop 2drop ;

@@ -25,10 +25,28 @@ last-codeword 6666 ?s
 
 \ codeword-set
 
-{} my-set
-my-set {}init!
+codeword-set my-set
+my-set set-init!
 
-my-set }next 1111 ?s
+0 my-set member-or-zero? ?true
+1111 my-set member-or-zero? ?true
+6666 my-set member-or-zero? ?true
 
+
+my-set first-in-set 1111 ?s
+1111 my-set next-in-set 1112 ?s
+
+1122 11 my-set narrow
+
+my-set first-in-set dup 1233 ?s
+my-set next-in-set dup 1234 ?s
+my-set next-in-set dup 1235 ?s
+my-set next-in-set dup 1236 ?s
+my-set next-in-set dup 1243 ?s
+
+my-set set-init!
+1234 40 my-set narrow
+my-set first-in-set dup 1234 ?s
+my-set next-in-set 0 ?s
 
 bye
