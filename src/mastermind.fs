@@ -4,6 +4,8 @@ require random.fs
 6 constant max-colors
 4 constant max-pegs
 
+max-pegs 10 * constant victory
+
 create guess-pegs max-pegs allot
 create secret-pegs max-pegs allot
 create guess-colors max-colors 1+ allot
@@ -196,3 +198,34 @@ variable min-codeword
    dup 2swap rot narrow
    minmax-match-result-score
    dup secret match-result ;
+
+variable moves
+
+codeword-set solution
+
+: random-codeword ( -- cw )
+    0 max-pegs 0 do
+        10 * max-colors random 1+ +
+    loop ;
+
+: random-secret
+    random-codeword to secret ;
+
+: guess
+    cr
+    moves off
+    solution set-init!
+    1122
+    dup secret match-result
+    begin
+        1 moves +!
+        moves @ 2 .r space
+        2dup swap 6 .r space 2 .r cr
+        dup victory <> while
+        solution guess-move
+    repeat
+    2drop ;
+
+        
+
+
