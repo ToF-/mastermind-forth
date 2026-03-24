@@ -122,3 +122,77 @@ last-codeword 8 / 1+ constant set-size
         next-codeword
     repeat
     drop 2drop ;
+
+
+999999 constant max-score
+
+create scores 100 cells allot
+
+: init-scores!
+    scores 100 cells erase ;
+
+: score++! ( r -- )
+    cells scores +
+    dup @ 1+ swap ! ;
+
+: score-max ( -- sc )
+    0
+    100 0 do
+        i cells scores + @ max
+    loop ;
+
+variable score
+
+: .set ( addr -- )
+    dup first-in-set
+    begin
+        ?dup while
+        dup .
+        over next-in-set
+    repeat
+    drop ;
+    
+: match-result-scores! ( cw,addr -- )
+    dup first-in-set
+    begin
+        ?dup while                 \ cw,addr,ca
+        swap -rot 2dup             \ addr,cw,ca,cw,ca
+        match-result score++!      \ addr,cw,ca
+        rot tuck next-in-set       \ cw,addr,cb
+    repeat
+    2drop ;
+
+: max-match-result-score ( cw,addr -- sc )
+    init-scores!
+    match-result-scores!
+    score-max ;
+
+variable min-score
+variable min-codeword
+
+999999 constant max-score
+
+: minmax-match-result-score ( addr -- cw )
+    max-score min-score !
+    first-codeword
+    begin
+        ?dup while
+        swap 2dup max-match-result-score   \ cw,addr,sc
+        >r 2dup member-or-zero?
+        if 0 else 1 then r>
+        2* + min-score @ over > if         \ cw,addr,sc
+            min-score !
+            over min-codeword !
+        else
+            drop
+        then
+        swap next-codeword
+    repeat
+    drop min-codeword @ ;
+
+6214 value secret
+
+: guess-move ( cw,r,addr -- cw',r' )
+   dup 2swap rot narrow
+   minmax-match-result-score
+   dup secret match-result ;
