@@ -32,6 +32,7 @@ my-set set-init!
 1111 my-set member-or-zero? ?true
 6666 my-set member-or-zero? ?true
 
+my-set set-length 1296 ?s
 
 my-set first-in-set 1111 ?s
 1111 my-set next-in-set 1112 ?s

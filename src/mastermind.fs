@@ -211,6 +211,26 @@ codeword-set solution
 : random-secret
     random-codeword to secret ;
 
+: valid-codeword? ( cw -- f )
+    true swap
+    max-pegs 0 do
+        10 /mod
+        swap 1 max-colors within 
+        rot and swap
+    loop drop ;
+
+: set-length ( addr -- n )
+    0 swap
+    dup first-in-set
+    begin
+        ?dup while
+        rot 1+ -rot
+        over next-in-set
+    repeat
+    drop ;
+
+
+        
 : guess
     cr
     moves off
@@ -220,7 +240,7 @@ codeword-set solution
     begin
         1 moves +!
         moves @ 2 .r space
-        2dup swap 6 .r space 2 .r cr
+        2dup swap 6 .r space 2 .r 9 emit solution set-length . cr
         dup victory <> while
         solution guess-move
     repeat
