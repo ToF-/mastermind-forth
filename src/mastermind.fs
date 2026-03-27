@@ -32,7 +32,7 @@ create secret-colors max-colors 1+ allot
     tuck codeword>pegs!
     pegs>colors! ;
 
-: _matches ( addr,addr -- n )
+: matches ( addr,addr -- n )
     0 -rot
     max-pegs 0 do
         2dup i + c@ swap i + c@ = if
@@ -40,7 +40,7 @@ create secret-colors max-colors 1+ allot
         then
     loop 2drop ;
 
-: _hits ( addr,addr -- n )
+: hits ( addr,addr -- n )
     0 -rot
     max-pegs + swap max-pegs +
     max-colors 0 do
@@ -48,50 +48,11 @@ create secret-colors max-colors 1+ allot
         min >r rot r> + -rot
     loop 2drop ;
         
-: _match-result ( addr,addr -- r )
-    2dup _hits
-    -rot _matches
+: match-result ( addr,addr -- r )
+    2dup hits
+    -rot matches
     dup 10 * -rot - + ;
     
-: peg-at ( i,addr -- p )
-    + c@ ;
-
-: codeword>pegs! ( cw,addr -- )
-    max-pegs 0 do                    \ cw,addr
-        dup i +                      \ cw,addr,addr'
-        rot 10 /mod                  \ addr,addr',p',cw'
-        swap rot c! swap             \ cw',addr'
-    loop 2drop ;
-
-: colors! ( pegs,colors -- )
-    dup max-colors 1+ erase
-    max-pegs 0 do
-        2dup swap i peg-at +
-        dup c@ 1+ swap c!
-    loop 2drop ;
-
-: matches ( addr1,addr2 -- n )
-    0 -rot max-pegs 0 do
-        2dup i swap peg-at
-        i rot peg-at
-        = if rot 1+ -rot then
-    loop 2drop ;
-
-: hits ( -- n )
-    secret-pegs secret-colors colors!
-    guess-pegs guess-colors colors!
-    0 max-colors 1+ 1 do
-        secret-colors i + c@
-        guess-colors i + c@
-        min +
-    loop ;
-
-: match-result ( cw,cw' -- r )
-    secret-pegs codeword>pegs!
-    guess-pegs codeword>pegs!
-    guess-pegs secret-pegs matches
-    hits over - swap 10 * + ;
-
 : (first-codeword) ( -- cw )
     0 max-pegs 0 do
         10 * 1 +
@@ -155,15 +116,17 @@ last-codeword 8 / 1+ constant set-size
     and swap c! ;
 
 pegs this
+pegs that
 pegs other
+
 : narrow ( cw,r,addr -- )
     rot this decompose
     swap >r
     first-codeword
     begin
         ?dup while               \ addr,ca
-        dup other decompose
-        this other _match-result \ addr,ca,r'
+        dup that decompose
+        this that match-result \ addr,ca,r'
         r@ <> if                 \ addr,ca
             2dup swap remove
         then
@@ -205,8 +168,8 @@ variable score
     dup first-in-set
     begin
         ?dup while
-        dup other decompose
-        this other _match-result score++!
+        dup that decompose
+        this that match-result score++!
         over next-in-set
     repeat
     drop ;
@@ -244,7 +207,8 @@ variable min-codeword
 : guess-move ( cw,r,addr -- cw',r' )
    dup 2swap rot narrow
    minmax-match-result-score
-   dup secret match-result ;
+   dup this decompose
+   this other match-result ;
 
 variable moves
 
@@ -276,18 +240,17 @@ codeword-set solution
     repeat
     drop ;
 
-
-        
 : guess
-    cr
+    1122 dup this decompose
+    secret other decompose
     moves off
     solution set-init!
-    1122
-    dup secret match-result
+    cr
+    this other match-result
     begin
         1 moves +!
         moves @ 2 .r space
-        2dup swap 6 .r space 2 .r 9 emit solution set-length . cr
+        2dup swap 6 .r space 2 .r cr
         dup victory <> while
         solution guess-move
     repeat

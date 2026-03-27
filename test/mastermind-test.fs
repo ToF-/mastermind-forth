@@ -11,12 +11,12 @@ pegs pegs-a
 pegs pegs-b
 \ match result
 1234 pegs-a decompose
-5656 pegs-b decompose pegs-a pegs-b _match-result 0 ?s
-1635 pegs-b decompose pegs-a pegs-b _match-result 20 ?s
-1234 pegs-b decompose pegs-a pegs-b _match-result 40 ?s
-4321 pegs-b decompose pegs-a pegs-b _match-result 04 ?s
-1122 pegs-b decompose pegs-a pegs-b _match-result 11 ?s
-1122 pegs-a decompose 2616 pegs-b decompose pegs-a pegs-b _match-result 02 ?s
+5656 pegs-b decompose pegs-a pegs-b match-result 0 ?s
+1635 pegs-b decompose pegs-a pegs-b match-result 20 ?s
+1234 pegs-b decompose pegs-a pegs-b match-result 40 ?s
+4321 pegs-b decompose pegs-a pegs-b match-result 04 ?s
+1122 pegs-b decompose pegs-a pegs-b match-result 11 ?s
+1122 pegs-a decompose 2616 pegs-b decompose pegs-a pegs-b match-result 02 ?s
 
 \ codeword values
 first-codeword 1111 ?s
@@ -61,7 +61,8 @@ my-set set-init!
 my-set minmax-match-result-score 1122 ?s
 
 6214 to secret
-1122 secret match-result 02 ?s
+1122 this decompose secret other decompose
+this other match-result 02 ?s
 1122 02 my-set guess-move swap 2344 ?s 11 ?s
 2344 11 my-set guess-move swap 2415 ?s 12 ?s
 2415 12 my-set guess-move swap 2531 ?s 02 ?s
