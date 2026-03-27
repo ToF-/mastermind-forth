@@ -11,26 +11,27 @@ max-colors max-pegs + constant pegs-size
 : pegs ( <name> -- )
     create pegs-size allot ;
 
+: colors> ( addr -- addr )
+    max-pegs + ;
+
 create guess-pegs max-pegs allot
 create secret-pegs max-pegs allot
 create guess-colors max-colors 1+ allot
 create secret-colors max-colors 1+ allot
 
-: codeword>pegs! ( cw,addr -- )
+: pegs! ( cw,addr -- )
     max-pegs over + swap do
         10 /mod swap 1- i c!
     loop drop ;
 
-: pegs>colors! ( addr -- )
-    dup max-pegs +
-    dup max-colors erase
+: colors! ( addr -- )
+    dup colors> dup max-colors erase
     swap max-pegs over + swap do
         i c@ over + dup c@ 1+ swap c!
     loop drop ;
 
 : decompose ( cw,add -- )
-    tuck codeword>pegs!
-    pegs>colors! ;
+    tuck pegs! colors! ;
 
 : matches ( addr,addr -- n )
     0 -rot
@@ -41,8 +42,8 @@ create secret-colors max-colors 1+ allot
     loop 2drop ;
 
 : hits ( addr,addr -- n )
-    0 -rot
-    max-pegs + swap max-pegs +
+    0 -rot colors>
+    swap colors>
     max-colors 0 do
         2dup i + c@ swap i + c@
         min >r rot r> + -rot
