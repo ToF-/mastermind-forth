@@ -6,11 +6,53 @@ require random.fs
 
 max-pegs 10 * constant victory
 
+max-colors max-pegs + constant pegs-size
+
+: pegs ( <name> -- )
+    create pegs-size allot ;
+
 create guess-pegs max-pegs allot
 create secret-pegs max-pegs allot
 create guess-colors max-colors 1+ allot
 create secret-colors max-colors 1+ allot
 
+: codeword>pegs! ( cw,addr -- )
+    max-pegs over + swap do
+        10 /mod swap 1- i c!
+    loop drop ;
+
+: pegs>colors! ( addr -- )
+    dup max-pegs +
+    dup max-colors erase
+    swap max-pegs over + swap do
+        i c@ over + dup c@ 1+ swap c!
+    loop drop ;
+
+: decompose ( cw,add -- )
+    tuck codeword>pegs!
+    pegs>colors! ;
+
+: _matches ( addr,addr -- n )
+    0 -rot
+    max-pegs 0 do
+        2dup i + c@ swap i + c@ = if
+            rot 1+ -rot
+        then
+    loop 2drop ;
+
+: _hits ( addr,addr -- n )
+    0 -rot
+    max-pegs + swap max-pegs +
+    max-colors 0 do
+        2dup i + c@ swap i + c@
+        min >r rot r> + -rot
+    loop 2drop ;
+        
+: _match-result ( addr,addr -- r )
+    2dup _hits
+    -rot _matches
+    dup 10 * -rot - + ;
+    
 : peg-at ( i,addr -- p )
     + c@ ;
 
@@ -112,18 +154,22 @@ last-codeword 8 / 1+ constant set-size
     rot 1 swap lshift 255 xor
     and swap c! ;
 
+pegs this
+pegs other
 : narrow ( cw,r,addr -- )
+    rot this decompose
+    swap >r
     first-codeword
     begin
-        ?dup while               \ cw,r,addr,ca
-        2over -rot               \ cw,r,addr,r,ca,cw
-        over match-result rot    \ cw,r,addr,ca,r',r
-        <> if
+        ?dup while               \ addr,ca
+        dup other decompose
+        this other _match-result \ addr,ca,r'
+        r@ <> if                 \ addr,ca
             2dup swap remove
         then
         next-codeword
     repeat
-    drop 2drop ;
+    drop r> drop ;
 
 
 999999 constant max-score
@@ -155,14 +201,15 @@ variable score
     drop ;
     
 : match-result-scores! ( cw,addr -- )
+    swap this decompose
     dup first-in-set
     begin
-        ?dup while                 \ cw,addr,ca
-        swap -rot 2dup             \ addr,cw,ca,cw,ca
-        match-result score++!      \ addr,cw,ca
-        rot tuck next-in-set       \ cw,addr,cb
+        ?dup while
+        dup other decompose
+        this other _match-result score++!
+        over next-in-set
     repeat
-    2drop ;
+    drop ;
 
 : max-match-result-score ( cw,addr -- sc )
     init-scores!
