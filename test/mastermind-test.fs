@@ -18,6 +18,16 @@ pegs pegs-b
 1122 pegs-b decompose pegs-a pegs-b match-result 11 ?s
 1122 pegs-a decompose 2616 pegs-b decompose pegs-a pegs-b match-result 02 ?s
 
+\ codeword / pegs
+1264 pegs-a decompose
+pegs-a codeword 1264 ?s
+pegs-a pegs-next! ?true pegs-a codeword 1265 ?s
+pegs-a pegs-next! ?true pegs-a codeword 1266 ?s
+pegs-a pegs-next! ?true pegs-a codeword 1311 ?s
+6666 pegs-a decompose
+pegs-a pegs-next! ?false
+
+
 \ codeword values
 first-codeword 1111 ?s
 last-codeword 6666 ?s

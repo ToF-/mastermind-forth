@@ -1,6 +1,5 @@
 require random.fs
 
-
 6 constant max-colors
 4 constant max-pegs
 
@@ -54,6 +53,32 @@ create secret-colors max-colors 1+ allot
     -rot matches
     dup 10 * -rot - + ;
     
+: pegs-first! ( addr -- )
+    dup max-pegs + swap do
+        1 i c!
+    loop ;
+
+: pegs-next! ( addr -- f )
+    1 swap
+    dup max-pegs + swap do
+        i c@ +
+        dup max-colors = if
+            drop 1 0
+        else
+            0 swap
+        then
+        i c!
+    loop
+    0= ;
+
+: codeword ( addr -- cw )
+    0 
+    max-pegs 0 do
+        10 * over
+        max-pegs i - + 1-
+        c@ 1+ +
+    loop nip ;
+
 : (first-codeword) ( -- cw )
     0 max-pegs 0 do
         10 * 1 +
