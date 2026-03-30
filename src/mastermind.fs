@@ -77,19 +77,25 @@ max-pegs 10 * constant victory
     here max-codewords 8 /
     dup allot erase ;
 
+: codeword-index ( addr -- n )
+    dup cell + @ ;
+
 : (set-codeword!) ( addr -- )
-    dup cell + @ swap @ nth-codeword! ;
+    dup codeword-index swap @ nth-codeword! ;
 
 : first-codeword!? ( addr -- f )
     0 over cell + ! (set-codeword!) true ;
 
 : next-codeword!? ( addr -- f )
-    dup cell + @ max-codewords 1- < if
+    dup codeword-index max-codewords 1- < if
         1 over cell + +! (set-codeword!) true
     else
         drop false
     then ;
-    
+
+: current-codeword ( addr -- cw )
+    @ codeword ;
+
 false [IF]
 
 : pegs-first! ( addr -- )

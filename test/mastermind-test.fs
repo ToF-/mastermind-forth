@@ -42,11 +42,12 @@ codeword-struct bar
 foo codeword-set foo-set
 
 \ iterate throug a codeword set
-foo-set first-codeword!? ?true foo codeword 1111 ?s
-foo-set next-codeword!?  ?true foo codeword 1112 ?s
+foo-set first-codeword!? ?true foo-set current-codeword 1111 ?s
+foo-set next-codeword!?  ?true foo-set current-codeword 1112 ?s
 foo-set first-codeword!? ?true
 1295 0 [DO] foo-set next-codeword!? ?true [LOOP]
-foo codeword 6666 ?s
+foo-set current-codeword 6666 ?s
+foo-set codeword-index 1295 ?s
 foo-set next-codeword!? ?false
 
 false [IF]
