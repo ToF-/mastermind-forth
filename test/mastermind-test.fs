@@ -5,7 +5,28 @@ page
 
 \ some values
 max-colors 6 ?s
-max-pegs 4 ?s
+max-pegs   4 ?s
+victory    40 ?s
+
+\ codeword structure 
+codeword-struct foo
+0 foo nth-codeword!
+foo 0 + c@ 0 ?s foo 1 + c@ 0 ?s foo 2 + c@ 0 ?s foo 3 + c@ 0 ?s
+foo colors> c@ 4 ?s
+1295 foo nth-codeword!
+foo 0 + c@ 5 ?s foo 1 + c@ 5 ?s foo 2 + c@ 5 ?s foo 3 + c@ 5 ?s
+foo colors> 5 + c@ 4 ?s
+
+0 foo nth-codeword!  foo codeword 1111 ?s
+1 foo nth-codeword!  foo codeword 1112 ?s
+36 foo nth-codeword!  foo codeword 1211 ?s
+51 foo nth-codeword! foo codeword 1234 ?s
+1295 foo nth-codeword!  foo codeword 6666 ?s
+
+1234 foo codeword! foo codeword 1234 ?s
+6666 foo codeword! foo codeword 6666 ?s
+
+false [IF]
 
 pegs pegs-a
 pegs pegs-b
@@ -78,5 +99,5 @@ this other match-result 02 ?s
 2415 12 my-set guess-move swap 2531 ?s 02 ?s
 2531 02 my-set guess-move swap 6214 ?s 40 ?s
 
-
+[THEN]
 bye

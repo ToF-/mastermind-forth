@@ -5,6 +5,49 @@ require random.fs
 
 max-pegs 10 * constant victory
 
+: codeword-struct ( <name> -- )
+    create max-pegs max-colors + allot ;
+
+: colors> ( addr -- addr' )
+    max-pegs + ;
+
+: (nth-codeword!) ( n,addr -- )
+    dup max-pegs + swap
+    do
+        max-colors /mod
+        swap i c!
+    loop drop ;
+
+: (colors!) ( addr -- )
+    max-pegs +
+    dup max-colors erase
+    dup dup max-pegs -
+    do
+        i c@ over +
+        dup c@ 1+ swap c!
+    loop drop ;
+
+: nth-codeword! ( n,addr -- )
+    tuck (nth-codeword!) (colors!) ;
+
+: (codeword!) ( n,addr -- )
+    dup max-pegs + swap do
+        10 /mod swap 1- i c!
+    loop drop ;
+
+: codeword! ( n,addr -- )
+    tuck (codeword!) (colors!) ;
+        
+: codeword ( addr -- n )
+    0 1 rot dup max-pegs + swap
+    do
+        dup i c@ 1+ *
+        rot + swap
+        10 *
+    loop drop ;
+
+false [IF]
+
 max-colors max-pegs + constant pegs-size
 
 : pegs ( <name> -- )
@@ -281,7 +324,5 @@ codeword-set solution
         solution guess-move
     repeat
     2drop ;
-
-        
-
+[THEN]
 
