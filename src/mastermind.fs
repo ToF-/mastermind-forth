@@ -3,6 +3,11 @@ require random.fs
 6 constant max-colors
 4 constant max-pegs
 
+: (max-codewords) ( -- n )
+    1 max-pegs 0 do 6 * loop ;
+
+ (max-codewords) constant max-codewords
+
 max-pegs 10 * constant victory
 
 : codeword-struct ( <name> -- )
@@ -46,35 +51,6 @@ max-pegs 10 * constant victory
         10 *
     loop drop ;
 
-false [IF]
-
-max-colors max-pegs + constant pegs-size
-
-: pegs ( <name> -- )
-    create pegs-size allot ;
-
-: colors> ( addr -- addr )
-    max-pegs + ;
-
-create guess-pegs max-pegs allot
-create secret-pegs max-pegs allot
-create guess-colors max-colors 1+ allot
-create secret-colors max-colors 1+ allot
-
-: pegs! ( cw,addr -- )
-    max-pegs over + swap do
-        10 /mod swap 1- i c!
-    loop drop ;
-
-: colors! ( addr -- )
-    dup colors> dup max-colors erase
-    swap max-pegs over + swap do
-        i c@ over + dup c@ 1+ swap c!
-    loop drop ;
-
-: decompose ( cw,add -- )
-    tuck pegs! colors! ;
-
 : matches ( addr,addr -- n )
     0 -rot
     max-pegs 0 do
@@ -90,12 +66,32 @@ create secret-colors max-colors 1+ allot
         2dup i + c@ swap i + c@
         min >r rot r> + -rot
     loop 2drop ;
-        
+
 : match-result ( addr,addr -- r )
     2dup hits
     -rot matches
     dup 10 * -rot - + ;
+
+: codeword-set ( <name> addr -- )
+    create , 0
+    here max-codewords 8 /
+    dup allot erase ;
+
+: (set-codeword!) ( addr -- )
+    dup cell + @ swap @ nth-codeword! ;
+
+: first-codeword!? ( addr -- f )
+    0 over cell + ! (set-codeword!) true ;
+
+: next-codeword!? ( addr -- f )
+    dup cell + @ max-codewords 1- < if
+        1 over cell + +! (set-codeword!) true
+    else
+        drop false
+    then ;
     
+false [IF]
+
 : pegs-first! ( addr -- )
     dup max-pegs + swap do
         1 i c!

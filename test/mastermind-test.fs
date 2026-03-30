@@ -11,33 +11,45 @@ victory    40 ?s
 \ codeword structure 
 codeword-struct foo
 0 foo nth-codeword!
+foo w@ hex 0 ?s decimal
 foo 0 + c@ 0 ?s foo 1 + c@ 0 ?s foo 2 + c@ 0 ?s foo 3 + c@ 0 ?s
 foo colors> c@ 4 ?s
 1295 foo nth-codeword!
-foo 0 + c@ 5 ?s foo 1 + c@ 5 ?s foo 2 + c@ 5 ?s foo 3 + c@ 5 ?s
+foo w@ hex 0505 ?s decimal foo 2 + w@ hex 0505 ?s decimal
 foo colors> 5 + c@ 4 ?s
 
-0 foo nth-codeword!  foo codeword 1111 ?s
-1 foo nth-codeword!  foo codeword 1112 ?s
-36 foo nth-codeword!  foo codeword 1211 ?s
-51 foo nth-codeword! foo codeword 1234 ?s
+0    foo nth-codeword!  foo codeword 1111 ?s
+1    foo nth-codeword!  foo codeword 1112 ?s
+36   foo nth-codeword!  foo codeword 1211 ?s
+51   foo nth-codeword!  foo codeword 1234 ?s
+foo w@ hex 0203 ?s decimal foo 2 + w@ hex 0001 ?s decimal
 1295 foo nth-codeword!  foo codeword 6666 ?s
 
 1234 foo codeword! foo codeword 1234 ?s
 6666 foo codeword! foo codeword 6666 ?s
 
-false [IF]
+\ matching
+codeword-struct bar
 
-pegs pegs-a
-pegs pegs-b
-\ match result
-1234 pegs-a decompose
-5656 pegs-b decompose pegs-a pegs-b match-result 0 ?s
-1635 pegs-b decompose pegs-a pegs-b match-result 20 ?s
-1234 pegs-b decompose pegs-a pegs-b match-result 40 ?s
-4321 pegs-b decompose pegs-a pegs-b match-result 04 ?s
-1122 pegs-b decompose pegs-a pegs-b match-result 11 ?s
-1122 pegs-a decompose 2616 pegs-b decompose pegs-a pegs-b match-result 02 ?s
+1234 foo codeword! 5656 bar codeword!  foo bar match-result 0 ?s
+                   1635 bar codeword!  foo bar match-result 20 ?s
+                   1234 bar codeword!  foo bar match-result 40 ?s
+                   4321 bar codeword!  foo bar match-result 04 ?s
+                   1122 bar codeword!  foo bar match-result 11 ?s
+1122 foo codeword! 2616 bar codeword!  foo bar match-result 02 ?s
+
+\ codeword-set structure
+foo codeword-set foo-set
+
+\ iterate throug a codeword set
+foo-set first-codeword!? ?true foo codeword 1111 ?s
+foo-set next-codeword!?  ?true foo codeword 1112 ?s
+foo-set first-codeword!? ?true
+1295 0 [DO] foo-set next-codeword!? ?true [LOOP]
+foo codeword 6666 ?s
+foo-set next-codeword!? ?false
+
+false [IF]
 
 \ codeword / pegs
 1264 pegs-a decompose
