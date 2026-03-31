@@ -8,9 +8,31 @@ max-colors 6 ?s
 max-pegs   4 ?s
 victory    40 ?s
 
+\ codeword index to value
+
+0 nth-codeword-value 1111 ?s
+1 nth-codeword-value 1112 ?s
+36 nth-codeword-value 1211 ?s
+max-codewords 1- nth-codeword-value 6666 ?s
+
+1111 codeword-number 0 ?s
+1235 codeword-number 52 ?s
+5431 codeword-number 984 ?s
+6666 codeword-number 1295 ?s
+bye
+
 \ codeword structure 
+
+codeword foo
+
+0 foo codeword-index!
+foo codeword-index 0 ?s
+foo codeword-value 1111 ?s
+false [IF]
+
 codeword-struct foo
 0 foo nth-codeword!
+
 foo w@ hex 0 ?s decimal
 foo 0 + c@ 0 ?s foo 1 + c@ 0 ?s foo 2 + c@ 0 ?s foo 3 + c@ 0 ?s
 foo colors> c@ 4 ?s
@@ -28,10 +50,10 @@ foo w@ hex 0203 ?s decimal foo 2 + w@ hex 0001 ?s decimal
 1234 foo codeword! foo codeword 1234 ?s
 6666 foo codeword! foo codeword 6666 ?s
 
-1111 codeword-nth 0 ?s
-1112 codeword-nth 1 ?s
-1211 codeword-nth 36 ?s
-6666 codeword-nth 1295 ?s
+1111 dbg codeword-index 0 ?s
+1112 codeword-index 1 ?s
+1211 codeword-index 36 ?s
+6666 codeword-index 1295 ?s
 
 \ matching
 codeword-struct bar
@@ -47,7 +69,7 @@ codeword-struct bar
 foo codeword-set foo-set
 
 \ iterate through a codeword set
-foo-set first-codeword!? ?true foo-set current-codeword 1111 ?s
+foo-set first-codeword!? ?true foo-set dbg current-codeword 1111 ?s 
 foo-set next-codeword!?  ?true foo-set current-codeword 1112 ?s
 foo-set first-codeword!? ?true
 1295 0 [DO] foo-set next-codeword!? ?true [LOOP]
@@ -61,7 +83,6 @@ foo-set next-codeword!? ?false
 123 foo-set nth-member? ?true
 123 foo-set nth-remove
 123 foo-set nth-member? ?true
-false [IF]
 
 \ codeword / pegs
 1264 pegs-a decompose

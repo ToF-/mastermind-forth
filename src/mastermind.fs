@@ -3,19 +3,53 @@ require random.fs
 6 constant max-colors
 4 constant max-pegs
 
+\ the max number of different codewords that can be set with the two constants above
 : (max-codewords) ( -- n )
     1 max-pegs 0 do 6 * loop ;
 
  (max-codewords) constant max-codewords
 
+\ the victory result N0 where N is the max number of pegs
 max-pegs 10 * constant victory
 
+\ converts e.g 36 to 0 1 0 0
+: nth-codeword-digits ( n -- dm,…,d1,d0 )
+    max-pegs 0 do max-colors /mod loop drop ;
+
+\ converts e.g 0 1 0 0 to 1211
+: digits>codeword-value ( dm,…,d1,d0 -- cw )
+    0 max-pegs 0 do 10 * swap 1+ + loop ;
+
+: nth-codeword-value ( n -- cw )
+    nth-codeword-digits
+    digits>codeword-value ;
+
+: codeword-number ( cw -- n )
+    max-pegs 0 do 10 /mod loop drop
+    0 max-pegs 0 do 6 * swap 1- + loop ;
+
+: codeword ( <name> )
+    create 0 , max-pegs max-pegs + allot ;
+
+: codeword-index! ( n,addr -- )
+    ! ;
+
+: codeword-index ( addr -- n )
+    @ ;
+
+: codeword-value ( addr -- cw )
+    drop 1111 ;
+
+false [IF]
+
+\ a struct to store the pegs and the color tally for computing matches and missed
 : codeword-struct ( <name> -- )
     create max-pegs max-colors + allot ;
 
 : colors> ( addr -- addr' )
     max-pegs + ;
 
+\ set the codeword part of the struct to the nth codeword value e.g 36 → 0100, 1295 → 5555
 : (nth-codeword!) ( n,addr -- )
     dup max-pegs + swap
     do
@@ -23,8 +57,9 @@ max-pegs 10 * constant victory
         swap i c!
     loop drop ;
 
+\ set the color tally of the codeword, e.g 0102 → 021100
 : (colors!) ( addr -- )
-    max-pegs +
+    colors>
     dup max-colors erase
     dup dup max-pegs -
     do
@@ -32,10 +67,12 @@ max-pegs 10 * constant victory
         dup c@ 1+ swap c!
     loop drop ;
 
+\ set the struct to the nth codeword value and tally colors accordingly
 : nth-codeword! ( n,addr -- )
     tuck (nth-codeword!) (colors!) ;
 
-: codeword-nth ( cw -- n )
+\ given a codeword with pegs varying from 1 to maxcolor, find the index
+: codeword-index ( cw -- n )
     max-pegs 0 do
         10 /mod swap 1- swap
     loop
@@ -44,13 +81,9 @@ max-pegs 10 * constant victory
         6 * +
     loop ;
 
-: (codeword!) ( n,addr -- )
-    dup max-pegs + swap do
-        10 /mod swap 1- i c!
-    loop drop ;
-
 : codeword! ( n,addr -- )
-    tuck (codeword!) (colors!) ;
+    swap codeword-index
+    swap nth-codeword! ;
         
 : codeword ( addr -- n )
     0 1 rot dup max-pegs + swap
@@ -87,20 +120,25 @@ max-pegs 10 * constant victory
     dup allot 255 fill ;
 
 : codeword-index ( addr -- n )
-    dup cell + @ ;
+    cell + @ ;
+
+: index> ( addr -- addr )
+    cell + ;
 
 : items> ( addr -- addr )
     cell + cell + ;
 
 : (set-codeword!) ( addr -- )
-    dup codeword-index swap @ nth-codeword! ;
+    dup codeword-index 
+    swap nth-codeword! ;
 
 : first-codeword!? ( addr -- f )
-    0 over cell + ! (set-codeword!) true ;
+    0 over cell + ! 
+    (set-codeword!) true ;
 
 : next-codeword!? ( addr -- f )
     dup codeword-index max-codewords 1- < if
-        1 over cell + +! (set-codeword!) true
+        1 swap cell + +! (set-codeword!) true
     else
         drop false
     then ;
@@ -116,8 +154,6 @@ max-pegs 10 * constant victory
     items> swap 8 /mod rot + dup c@
     rot 1 swap lshift 255 xor and
     swap c! ;
-
-false [IF]
 
 : pegs-first! ( addr -- )
     dup max-pegs + swap do
