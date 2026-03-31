@@ -28,6 +28,11 @@ foo w@ hex 0203 ?s decimal foo 2 + w@ hex 0001 ?s decimal
 1234 foo codeword! foo codeword 1234 ?s
 6666 foo codeword! foo codeword 6666 ?s
 
+1111 codeword-nth 0 ?s
+1112 codeword-nth 1 ?s
+1211 codeword-nth 36 ?s
+6666 codeword-nth 1295 ?s
+
 \ matching
 codeword-struct bar
 
@@ -41,7 +46,7 @@ codeword-struct bar
 \ codeword-set structure
 foo codeword-set foo-set
 
-\ iterate throug a codeword set
+\ iterate through a codeword set
 foo-set first-codeword!? ?true foo-set current-codeword 1111 ?s
 foo-set next-codeword!?  ?true foo-set current-codeword 1112 ?s
 foo-set first-codeword!? ?true
@@ -50,6 +55,12 @@ foo-set current-codeword 6666 ?s
 foo-set codeword-index 1295 ?s
 foo-set next-codeword!? ?false
 
+\ codeword-set member and remove
+
+.s key drop
+123 foo-set nth-member? ?true
+123 foo-set nth-remove
+123 foo-set nth-member? ?true
 false [IF]
 
 \ codeword / pegs

@@ -35,6 +35,15 @@ max-pegs 10 * constant victory
 : nth-codeword! ( n,addr -- )
     tuck (nth-codeword!) (colors!) ;
 
+: codeword-nth ( cw -- n )
+    max-pegs 0 do
+        10 /mod swap 1- swap
+    loop
+    drop 0
+    max-pegs 0 do
+        6 * +
+    loop ;
+
 : (codeword!) ( n,addr -- )
     dup max-pegs + swap do
         10 /mod swap 1- i c!
@@ -73,12 +82,15 @@ max-pegs 10 * constant victory
     dup 10 * -rot - + ;
 
 : codeword-set ( <name> addr -- )
-    create , 0
-    here max-codewords 8 /
-    dup allot erase ;
+    create , 0 ,
+    here max-codewords 8 / 1+
+    dup allot 255 fill ;
 
 : codeword-index ( addr -- n )
     dup cell + @ ;
+
+: items> ( addr -- addr )
+    cell + cell + ;
 
 : (set-codeword!) ( addr -- )
     dup codeword-index swap @ nth-codeword! ;
@@ -95,6 +107,15 @@ max-pegs 10 * constant victory
 
 : current-codeword ( addr -- cw )
     @ codeword ;
+
+: nth-member? ( n,addr -- f )
+    items> swap 8 /mod rot + c@
+    1 rot lshift and ;
+
+: nth-remove ( n,addr -- )
+    items> swap 8 /mod rot + dup c@
+    rot 1 swap lshift 255 xor and
+    swap c! ;
 
 false [IF]
 
